@@ -1,5 +1,5 @@
 import Navbar from "../components/navbar";
-import Services from "./Services";
+import Services from "../components/Services";
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
 import About from "../components/About";
