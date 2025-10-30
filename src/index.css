@@ -1,1 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --font-montserrat: "Montserrat", sans-serif;
+  --color-teal-base: #f4fcfa;
+  --color-teal-light: #26abac;
+  --color-calm-blue: #bde2ea;
+  --color-blue-light: rgba(189, 226, 234, 0.2);
+}
+
+.custom-container {
+  max-width: 64rem;
+  width: 100%;
+  margin: 0 auto;
+  align-items: center;
+  text-align: center;
+}
+
+.bg-about-banner {
+  background-image: url("./assets/images//about-banner.jpg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
