@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdArrowBack } from "react-icons/md";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import bgImg from "../assets/images/bg-image.jpg";
 import Swal from "sweetalert2";
 

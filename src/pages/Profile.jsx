@@ -1,4 +1,4 @@
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import bgImg from '../assets/images/profile/banner.png';
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";

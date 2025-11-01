@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MdArrowBack } from "react-icons/md";
 import { Brain } from "lucide-react";
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import HappyPerson from "../assets/images/moodtracker/mood-faces.png";
 import Swal from "sweetalert2";
 
