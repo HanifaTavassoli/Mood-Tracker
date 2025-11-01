@@ -3,7 +3,7 @@ import Services from "../components/Services";
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
 import About from "../components/About";
-import Contact from "../components/Contact";
+
 
 import Features from "../components/Features";
 function Home() {
