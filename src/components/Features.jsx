@@ -4,57 +4,59 @@ import numberThree from "../assets/images/features/03.svg";
 import smile from "../assets/images/features/smile.jpg";
 import brain from "../assets/images/features/brain.svg";
 import faceStates from "../assets/images/features/face-state.png";
+
 function Features() {
   return (
-    <div className=" mx-auto py-12">
-      <h2 className="text-2xl font-bold mb-20 text-center">
+    <div className="py-12 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto">
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-12 text-center">
         Empower Your Mental Well-Being
       </h2>
-      <div className=" w-5xl grid grid-cols-2 justify-between items-center gap-12 mx-auto">
-        <div className="">
-          <img src={numberOne} alt="number one" className="mb-4" />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-12 items-center">
+       
+        <div>
+          <img src={numberOne} alt="number one" className="mb-4 w-12 h-12 sm:w-16 sm:h-16" />
           <h3 className="font-medium text-xl mb-2">Track Your Mood</h3>
-          <p className="font-light text-lg">
-            Easily log your daily mood and emotions in just a few taps. From
-            happy to stressed, our Mood Tracker helps you monitor your emotional
-            journey over time.
+          <p className="font-light text-sm sm:text-base">
+            Easily log your daily mood and emotions in just a few taps. From happy to stressed, our Mood Tracker helps you monitor your emotional journey over time.
           </p>
         </div>
-        <div className="text-end">
+        <div className="flex justify-center md:justify-end">
           <img
             src={smile}
             alt="smily face"
-            className="w-50 rounded-full border inline-block"
+            className="w-40 sm:w-48 lg:w-56 h-auto rounded-full border object-cover"
           />
         </div>
-        <div className="text-start">
-          <img src={brain} alt="smily face" className="w-50 inline-block" />
+
+       
+        <div className="flex justify-center md:justify-start">
+          <img
+            src={brain}
+            alt="brain"
+            className="w-40 sm:w-48 lg:w-56 h-auto object-cover"
+          />
         </div>
-        <div className="">
-          <img src={numberTwo} alt="number two" className="mb-4" />
+        <div>
+          <img src={numberTwo} alt="number two" className="mb-4 w-12 h-12 sm:w-16 sm:h-16" />
           <h3 className="font-medium text-xl mb-2">AI-Powered Suggestions</h3>
-          <p className="font-light text-lg">
-            Get personalized, AI-generated suggestions to improve your mental
-            well-being. Whether it's taking a break, trying mindfulness, or
-            starting a new activity, we provide helpful insights to lift your
-            mood.
+          <p className="font-light text-sm sm:text-base">
+            Get personalized, AI-generated suggestions to improve your mental well-being. Whether it's taking a break, trying mindfulness, or starting a new activity, we provide helpful insights to lift your mood.
           </p>
         </div>
-        <div className="">
-          <img src={numberThree} alt="number three" className="mb-4" />
+
+        <div>
+          <img src={numberThree} alt="number three" className="mb-4 w-12 h-12 sm:w-16 sm:h-16" />
           <h3 className="font-medium text-xl mb-2">Personalized Insights</h3>
-          <p className="font-light text-lg">
-            Gain deeper insights into your mental health. Our app analyzes your
-            tracked moods and habits, providing personalized feedback to help
-            you understand what’s impacting your well-being." Focus on the app's
-            ability to give users actionable advice based on their data
+          <p className="font-light text-sm sm:text-base">
+            Gain deeper insights into your mental health. Our app analyzes your tracked moods and habits, providing personalized feedback to help you understand what’s impacting your well-being. Focus on the app's ability to give users actionable advice based on their data.
           </p>
         </div>
-        <div className="text-end">
+        <div className="flex justify-center md:justify-end">
           <img
             src={faceStates}
             alt="face states"
-            className="w-50 inline-block"
+            className="w-40 sm:w-48 lg:w-56 h-auto object-cover"
           />
         </div>
       </div>
