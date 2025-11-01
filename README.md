@@ -7,7 +7,7 @@ It helps users **track their mood**, **reflect on their day**, and receive **AI-
 
 ## 🖼️ Preview
 
-![MoodTracker Screenshot](./assets/images/MoodTracker.PNG)
+![MoodTracker Screenshot](./src/assets/images/MoodTracker.PNG)
 
 *(Replace with your actual screenshot path or GitHub image URL.)*
 
