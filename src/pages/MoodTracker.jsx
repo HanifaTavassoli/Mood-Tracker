@@ -1,67 +1,258 @@
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { MdArrowBack } from "react-icons/md";
+import { Brain } from "lucide-react";
 import Navbar from "../components/navbar";
-// import moodTracker from "../assets/images/mood-traker.png";
+import HappyPerson from "../assets/images/moodtracker/mood-faces.png";
+import Swal from "sweetalert2";
+
+const apikey = import.meta.env.VITE_API_KEY;
+
 function MoodTracker() {
+  const navigate = useNavigate();
+
+  const [mood, setMood] = useState("");
+  const [notes, setNotes] = useState("");
+  const [aiTip, setAiTip] = useState("");
+
+  const today = new Date();
+  const formattedDate = today.toISOString().split("T")[0];
+
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (!user) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in first!",
+        confirmButtonColor: "#06b6d4",
+        confirmButtonText: "Go to Login",
+      }).then(() => navigate("/login"));
+    }
+  }, [user, navigate]);
+
+  // Load today's entry if exists
+  useEffect(() => {
+    if (!user) return;
+    const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
+    const todayEntry = storedEntries.find(
+      (e) => e.userEmail === user.email && e.date === formattedDate
+    );
+    if (todayEntry) {
+      setMood(todayEntry.mood);
+      setNotes(todayEntry.note);
+      setAiTip(todayEntry.aiTip);
+    }
+  }, [user, formattedDate]);
+
+  const callOpenAIPAI = async () => {
+    if (!user) return;
+
+    if (!mood || !notes) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Entry",
+        text: "Please select a mood and write your notes.",
+        confirmButtonColor: "#06b6d4",
+      });
+      return;
+    }
+
+    const APIBody = {
+      model: "gpt-3.5-turbo-instruct",
+      prompt: `Write three very short motivational suggestions for someone feeling ${mood} today. Note: ${notes}`,
+      max_tokens: 60,
+      temperature: 0.7,
+    };
+
+    try {
+      const res = await fetch("https://api.openai.com/v1/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + apikey,
+        },
+        body: JSON.stringify(APIBody),
+      });
+
+      const data = await res.json();
+      const suggestionText = data.choices[0].text.trim();
+      setAiTip(suggestionText);
+
+      const newEntry = {
+        date: formattedDate,
+        mood,
+        note: notes,
+        aiTip: suggestionText,
+        userEmail: user.email,
+      };
+
+      const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
+      const updatedEntries = [
+        ...storedEntries.filter(
+          (e) => e.userEmail !== user.email || e.date !== formattedDate
+        ),
+        newEntry,
+      ];
+      localStorage.setItem("moodEntries", JSON.stringify(updatedEntries));
+
+      Swal.fire({
+        icon: "success",
+        title: "Mood Logged!",
+        text: "Your mood has been saved successfully.",
+        confirmButtonColor: "#06b6d4",
+      });
+
+      setMood("");
+      setNotes("");
+    } catch (err) {
+      console.error("AI API error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to fetch AI suggestions. Please try again.",
+        confirmButtonColor: "#06b6d4",
+      });
+    }
+  };
+
   return (
     <>
       <Navbar />
-      <div className="grid grid-cols-1 px-5 gap-4 border w-7xl mx-auto pt-[5rem] text-center">
-        <div>
-          {/* <img src={moodTracker} alt="" /> */}
-          <div class="mx-auto border border-red-400 mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div class="sm:col-span-4">
-              <label
-                for="country"
-                class="block text-sm/6 font-medium text-gray-900"
-              >
-                Country
-              </label>
-              <div class="mt-2 grid grid-cols-1">
+      <div className="min-h-screen font-montserrat flex flex-col lg:flex-row gap-6 px-4 md:px-6 py-6">
+       
+        <div className="flex-1 flex flex-col gap-5">
+         
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
+            <Link to="/" className="flex items-center text-neutral-500">
+              <MdArrowBack className="text-md mr-1" />
+              <span>Home</span>
+            </Link>
+            <Link
+              to="/profile"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-md text-sm font-medium"
+            >
+              Go to Profile
+            </Link>
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              callOpenAIPAI();
+            }}
+            className="flex flex-col gap-4"
+          >
+           
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 flex items-center">
+                <label
+                  htmlFor="date"
+                  className="text-sm font-medium text-gray-900 mr-2"
+                >
+                  Today:
+                </label>
+                <input
+                  type="date"
+                  value={formattedDate}
+                  readOnly
+                  id="date"
+                  name="date"
+                  className="flex-1 border-0 rounded-sm bg-white px-3 py-2 text-gray-900 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex-1 flex flex-col">
+                <label
+                  htmlFor="mood"
+                  className="block text-sm font-medium text-gray-900 mb-1"
+                >
+                  What are you feeling today?
+                </label>
                 <select
-                  id="country"
-                  name="country"
-                  autocomplete="country-name"
-                  class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  id="mood"
+                  name="mood"
+                  onChange={(e) => setMood(e.target.value)}
+                  value={mood}
+                  className="w-full rounded-md bg-white py-2 px-3 text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-cyan-600 cursor-pointer"
                 >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
+                  <option value="">Select mood...</option>
+                  <option value="happy">Happy 😊</option>
+                  <option value="sad">Sad 😢</option>
+                  <option value="angry">Angry 😡</option>
+                  <option value="anxious">Anxious 😰</option>
+                  <option value="calm">Calm 🧘‍♀️</option>
+                  <option value="excited">Excited 🤩</option>
+                  <option value="tired">Tired 😴</option>
+                  <option value="lonely">Lonely 😔</option>
+                  <option value="grateful">Grateful 🙏</option>
+                  <option value="frustrated">Frustrated 😤</option>
+                  <option value="focused">Focused 🎯</option>
+                  <option value="hopeful">Hopeful 🌤️</option>
                 </select>
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                  data-slot="icon"
-                  aria-hidden="true"
-                  class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                >
-                  <path
-                    d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
-                    clip-rule="evenodd"
-                    fill-rule="evenodd"
-                  />
-                </svg>
               </div>
             </div>
 
-            <div class="col-span-full">
+            <div>
               <label
-                for="about"
-                class="block text-sm/6 font-medium text-gray-900"
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-900 mb-1"
               >
-                About
+                Daily Notes
               </label>
-              <div class="mt-2">
-                <textarea
-                  id="about"
-                  name="about"
-                  rows="3"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                ></textarea>
-              </div>
-              <p class="mt-3 text-sm/6 text-gray-600">
-                Write a few sentences about yourself.
-              </p>
+              <textarea
+                id="notes"
+                name="notes"
+                rows="3"
+                onChange={(e) => setNotes(e.target.value)}
+                value={notes}
+                placeholder="Write your thoughts for today..."
+                className="w-full rounded-md bg-white px-3 py-2 text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-cyan-600"
+              ></textarea>
             </div>
-          </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+              <button
+                type="button"
+                className="text-neutral-500 border px-3 py-1 rounded hover:bg-cyan-600 hover:text-white transition-colors duration-300 w-full sm:w-auto"
+                onClick={() => {
+                  setMood("");
+                  setNotes("");
+                  setAiTip("");
+                }}
+              >
+                Reset Entry
+              </button>
+              <button
+                type="submit"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded transition-colors duration-300 w-full sm:w-auto"
+              >
+                Log Mood
+              </button>
+            </div>
+          </form>
+
+          {aiTip && (
+            <div className="mt-5 bg-[#f4fcfa] border border-cyan-200 rounded-xl p-4">
+              <h3 className="font-semibold text-gray-700 flex items-center gap-2 mb-3">
+                <Brain className="text-teal-500" size="20px" /> AI suggestions...
+              </h3>
+              <ol className="list-decimal ml-5 text-sm">
+                {aiTip.split(/(?=\d+\.)/).map((sentence, idx) => (
+                  <li key={idx}>{sentence}</li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+        <div className="hidden lg:flex flex-1 justify-center items-center bg-cyan-50 rounded-lg p-4">
+          <img
+            src={HappyPerson}
+            alt="mood face states"
+            className="w-full h-auto max-w-md object-contain"
+          />
         </div>
       </div>
     </>
