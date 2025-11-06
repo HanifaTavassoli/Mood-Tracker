@@ -3,22 +3,31 @@ import { useNavigate, Link } from "react-router-dom";
 import { MdArrowBack } from "react-icons/md";
 import { Brain } from "lucide-react";
 import Navbar from "../components/Navbar";
-import HappyPerson from "../assets/images/moodtracker/mood-faces.png";
+// import HappyPerson from "../assets/images/moodtracker/mood-faces.png";
+import HappyPerson from "../assets/images/moodtracker/happy-person.png";
 import Swal from "sweetalert2";
+import {Loader2} from 'lucide-react';
+import {FaSpinner} from 'react-icons/fa';
 
 const apikey = import.meta.env.VITE_API_KEY;
 
 function MoodTracker() {
   const navigate = useNavigate();
 
+
   const [mood, setMood] = useState("");
   const [notes, setNotes] = useState("");
   const [aiTip, setAiTip] = useState("");
+  const [loading,setLoading]=useState(false);
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
   const user = JSON.parse(localStorage.getItem("userInfo"));
+
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),3000)
+  },[]);
 
   // Check if user is logged in
   useEffect(() => {
@@ -47,7 +56,7 @@ function MoodTracker() {
     }
   }, [user, formattedDate]);
 
-  const callOpenAIPAI = async () => {
+  const logMoodHandler=()=>{
     if (!user) return;
 
     if (!mood || !notes) {
@@ -59,6 +68,14 @@ function MoodTracker() {
       });
       return;
     }
+
+    callOpenAIPAI()
+  }
+
+
+  const callOpenAIPAI = async () => {
+
+    setLoading(true); 
 
     const APIBody = {
       model: "gpt-3.5-turbo-instruct",
@@ -115,8 +132,30 @@ function MoodTracker() {
         text: "Failed to fetch AI suggestions. Please try again.",
         confirmButtonColor: "#06b6d4",
       });
-    }
+    }finally {
+    setLoading(false); // hide spinner after done
+  }
   };
+
+  const resetHandler=()=>{
+    setMood("");
+    setNotes("");
+    setAiTip("");
+
+    // Also remove today's entry from localStorage
+    const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
+    const updatedEntries = storedEntries.filter(
+      (e) => e.userEmail !== user.email || e.date !== formattedDate
+    );
+    localStorage.setItem("moodEntries", JSON.stringify(updatedEntries));
+
+    Swal.fire({
+      icon: "info",
+      title: "Entry Reset",
+      text: "Today's mood entry has been cleared.",
+      confirmButtonColor: "#06b6d4",
+    });
+  }
 
   return (
     <>
@@ -125,7 +164,7 @@ function MoodTracker() {
        
         <div className="flex-1 flex flex-col gap-5">
          
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0 mt-[4rem]">
             <Link to="/" className="flex items-center text-neutral-500">
               <MdArrowBack className="text-md mr-1" />
               <span>Home</span>
@@ -141,7 +180,7 @@ function MoodTracker() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              callOpenAIPAI();
+              logMoodHandler();
             }}
             className="flex flex-col gap-4"
           >
@@ -216,35 +255,68 @@ function MoodTracker() {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
               <button
                 type="button"
-                className="text-neutral-500 border px-3 py-1 rounded hover:bg-cyan-600 hover:text-white transition-colors duration-300 w-full sm:w-auto"
-                onClick={() => {
-                  setMood("");
-                  setNotes("");
-                  setAiTip("");
-                }}
+                className="text-neutral-500 border px-3 py-1 rounded hover:bg-cyan-600 hover:text-white transition-colors duration-300 text-sm w-full cursor-pointer sm:w-auto"
+                onClick={resetHandler}
               >
                 Reset Entry
               </button>
               <button
                 type="submit"
-                className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded transition-colors duration-300 w-full sm:w-auto"
+                disabled={loading}
+                className={`bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded transition-all duration-300 w-full text-sm sm:w-auto flex items-center justify-center cursor-pointer gap-2 ${
+                  loading ? "opacity-70 cursor-not-allowed" : ""
+                }`}
               >
-                Log Mood
+                {loading ? (
+                  <>
+                    <FaSpinner className="animate-spin text-white text-md" />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Log Mood</span>
+                )}
               </button>
+
+              {/* <button
+                type="submit"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded transition-colors duration-300 w-full sm:w-auto flex justify-between"
+              >
+                {
+                  loading ?
+                   (<>
+                  <FaSpinner className="animate-spin text-white text-lg"/><span>loading...</span>
+                  </>
+                  )  
+                  :  <span>Log Mood</span>
+                  
+                }
+              </button> */}
             </div>
           </form>
 
           {aiTip && (
-            <div className="mt-5 bg-[#f4fcfa] border border-cyan-200 rounded-xl p-4">
+           <div className="flex flex-col gap-3">
+            <div className="mt-5 bg-[#f4fcfa] border border-cyan-200 rounded-xl p-4 flex flex-col">
               <h3 className="font-semibold text-gray-700 flex items-center gap-2 mb-3">
                 <Brain className="text-teal-500" size="20px" /> AI suggestions...
               </h3>
-              <ol className="list-decimal ml-5 text-sm">
+              <ol className="ml-5 text-sm">
                 {aiTip.split(/(?=\d+\.)/).map((sentence, idx) => (
                   <li key={idx}>{sentence}</li>
                 ))}
               </ol>
             </div>
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={logMoodHandler}
+                className="text-xs text-cyan-600 hover:bg-cyan-700 hover:text-white  bg-white px-4 py-2 rounded-md transition-colors duration-300 border border-cyan-600 cursor-pointer"
+              >
+                Regenerate
+              </button>
+            </div>
+          </div>
+
           )}
         </div>
         <div className="hidden lg:flex flex-1 justify-center items-center bg-cyan-50 rounded-lg p-4">
