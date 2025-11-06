@@ -47,11 +47,11 @@ function SignUp() {
 
   return (
     <div
-      className="min-h-screen bg-no-repeat bg-center bg-cover font-montserrat flex flex-col"
+      className="min-h-screen bg-no-repeat bg-center bg-cover font-montserrat flex flex-row"
       style={{ backgroundImage: `url(${bgImg})` }}
     >
       <Navbar />
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-xl mx-auto mt-24">
+      <div className=" basis-3/5 flex flex-col justify-center px-4 sm:px-6 lg:px-8 max-w-xl mx-auto mt-24">
         <Link
           to="/"
           className="flex items-center justify-start text-neutral-500 mb-4"
@@ -62,7 +62,7 @@ function SignUp() {
 
         <h2 className="font-bold text-3xl text-start mb-6">Sign up</h2>
 
-        <form onSubmit={handleSignUp} className="grid grid-cols-1 gap-5 sm:grid-cols-6">
+        <form onSubmit={handleSignUp} className=" grid grid-cols-1 gap-5 sm:grid-cols-6">
           <div className="sm:col-span-3">
             <label htmlFor="first-name" className="block text-sm font-medium text-gray-900">
               First name
