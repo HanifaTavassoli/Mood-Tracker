@@ -5,22 +5,14 @@ import { FaTelegramPlane, FaLinkedin, FaWhatsapp, FaGithub } from "react-icons/f
 function Footer() {
   return (
     <>
-      <svg className="w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-        <path
-          fill="#bde2ea"
-          d="m0 160 48 21.3C96 203 192 245 288 224S480 117 576 90.7C672 64 768 96 864 117.3c96 21.7 192 31.7 288 21.4C1248 128 1344 96 1392 80l48-16v256H0Z"
-        ></path>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+    <path
+      fill="#bde2ea"
+      d="m0 32 34.3 48C68.6 128 137 224 206 245.3c68.3 21.7 137-32.3 205-42.6C480 192 549 224 617 240c68.7 16 137 16 206-16 68.4-32 137-96 206-90.7 68.1 5.7 137 79.7 205 96 68.9 15.7 137-26.3 172-48l34-21.3v160H0Z"
+    ></path>
+  </svg>
 
       <footer className="bg-calm-blue">
-        <div className="text-center mb-5">
-          <img
-            src={logo}
-            alt="Mood Tracker logo"
-            className="rounded-full w-20 inline-block"
-          />
-        </div>
-
         <div className="px-4 md:px-6 lg:px-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
           <div className="flex flex-col items-center md:items-start gap-2 text-center md:text-left">
@@ -30,6 +22,12 @@ function Footer() {
             <Link to="/blog" className="text-gray-600 hover:text-[#26abac]">Services</Link>
           </div>
 
+          <div className="flex flex-col justify-center items-center gap-6">
+            <img
+            src={logo}
+            alt="Mood Tracker logo"
+            className="block rounded-full w-20"
+          />
           <div className="flex justify-center items-center gap-6">
             <a href="https://t.me/YourUsername" target="_blank" rel="noopener noreferrer">
               <FaTelegramPlane className="text-[#26abac] text-2xl cursor-pointer" />
@@ -43,6 +41,7 @@ function Footer() {
             <a href="https://github.com/YourUsername" target="_blank" rel="noopener noreferrer">
               <FaGithub className="text-[#26abac] text-2xl cursor-pointer" />
             </a>
+          </div>
           </div>
 
           <div className="flex flex-col items-center md:items-end text-center md:text-end gap-2">
