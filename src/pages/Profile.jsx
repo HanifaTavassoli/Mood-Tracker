@@ -16,13 +16,13 @@ function Profile() {
   const [mood, setMood] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Load previous data
+ 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("moodEntries")) || [];
     setHistory(saved);
   }, []);
 
-  // Get mood/notes for selected date
+ 
   useEffect(() => {
     const entry = history.find(e => e.date === date.toISOString().split("T")[0]);
     if (entry) {
