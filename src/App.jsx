@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import "./App.css";
+
 import Home from "./pages/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUp from "./pages/SignUp";
@@ -7,8 +7,6 @@ import Login from "./pages/Login";
 import MoodTracker from "./pages/MoodTracker";
 import Profile from "./pages/Profile";
 function App() {
-
-
   return (
     <BrowserRouter>
       <Routes>
