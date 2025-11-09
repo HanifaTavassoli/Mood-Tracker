@@ -32,7 +32,10 @@ function Login() {
         icon: "success",
         title: "Login Successful!",
         text: `Welcome back, ${storedUser.name}!`,
-        confirmButtonColor: "#06b6d4",
+        showConfirmButton: false,
+        timerProgressBar: true,
+        timer: 3000,
+        // confirmButtonColor: "#06b6d4",
       }).then(() => navigate("/moodtracker"));
     } else {
       Swal.fire({
@@ -59,11 +62,17 @@ function Login() {
           <span>Back</span>
         </Link>
 
-        <h2 className="font-bold text-3xl text-start mb-6">Sign in</h2>
+        <h2 className="font-bold text-3xl text-start mb-6">Login</h2>
 
-        <form onSubmit={handleLogin} className=" grid grid-cols-1 gap-5 sm:grid-cols-6">
+        <form
+          onSubmit={handleLogin}
+          className=" grid grid-cols-1 gap-5 sm:grid-cols-6"
+        >
           <div className="sm:col-span-full">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900"
+            >
               Email
             </label>
             <input
@@ -77,7 +86,10 @@ function Login() {
           </div>
 
           <div className="sm:col-span-full">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900"
+            >
               Password
             </label>
             <input
