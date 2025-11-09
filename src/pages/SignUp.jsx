@@ -37,9 +37,10 @@ function SignUp() {
     Swal.fire({
       icon: "success",
       title: "Account Created!",
-      text: "🎉 Your account has been created successfully! Please log in to continue.",
-      confirmButtonColor: "#06b6d4",
-      confirmButtonText: "Go to Login",
+      text: "🎉 Your account has been created successfully!",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
     }).then(() => {
       navigate("/login");
     });
@@ -62,9 +63,15 @@ function SignUp() {
 
         <h2 className="font-bold text-3xl text-start mb-6">Sign up</h2>
 
-        <form onSubmit={handleSignUp} className=" grid grid-cols-1 gap-5 sm:grid-cols-6">
+        <form
+          onSubmit={handleSignUp}
+          className=" grid grid-cols-1 gap-5 sm:grid-cols-6"
+        >
           <div className="sm:col-span-3">
-            <label htmlFor="first-name" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="first-name"
+              className="block text-sm font-medium text-gray-900"
+            >
               First name
             </label>
             <input
@@ -78,7 +85,10 @@ function SignUp() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="last-name" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="last-name"
+              className="block text-sm font-medium text-gray-900"
+            >
               Last name
             </label>
             <input
@@ -92,7 +102,10 @@ function SignUp() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900"
+            >
               Email
             </label>
             <input
@@ -106,7 +119,10 @@ function SignUp() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900"
+            >
               Password
             </label>
             <input
