@@ -20,8 +20,10 @@ function Navbar() {
       icon: "success",
       title: "Signed Out",
       text: "You have successfully signed out!",
-      confirmButtonColor: "#06b6d4",
-    }).then(() => navigate("/login"));
+      showConfirmButton: false,
+      timerProgressBar: true,
+      timer: 3000,
+    }).then(() => navigate("/signup"));
   };
 
   const handleMoodTrackerClick = () => {
@@ -53,7 +55,6 @@ function Navbar() {
 
   return (
     <nav className="flex items-center justify-center w-auto rounded-full px-3 mx-auto lg:shadow-md lg:shadow-sky-500/50 bg-white text-black lg:fixed lg:left-1/2 lg:transform lg:-translate-x-1/2 mt-3 font-montserrat">
-      
       <div className="hidden lg:flex">
         <NavLink to="/" className="mr-3">
           <span className="sr-only">Mood Tracker</span>
@@ -63,7 +64,6 @@ function Navbar() {
 
       <div className="hidden lg:flex w-full justify-center">
         <ul className="flex items-center justify-around w-full lg:gap-x-12">
-         
           <li>
             <NavLink
               to="/"
