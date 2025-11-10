@@ -3,33 +3,26 @@ import { useNavigate, Link } from "react-router-dom";
 import { MdArrowBack } from "react-icons/md";
 import { Brain } from "lucide-react";
 import Navbar from "../components/Navbar";
-// import HappyPerson from "../assets/images/moodtracker/mood-faces.png";
 import HappyPerson from "../assets/images/moodtracker/happy-person.png";
 import Swal from "sweetalert2";
-import {Loader2} from 'lucide-react';
-import {FaSpinner} from 'react-icons/fa';
+import { FaSpinner } from "react-icons/fa";
 
 const apikey = import.meta.env.VITE_API_KEY;
 
 function MoodTracker() {
   const navigate = useNavigate();
 
-
   const [mood, setMood] = useState("");
   const [notes, setNotes] = useState("");
   const [aiTip, setAiTip] = useState("");
-  const [loading,setLoading]=useState(false);
+  const [loading, setLoading] = useState(false);
 
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
 
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
-  useEffect(()=>{
-    setTimeout(()=>setLoading(false),3000)
-  },[]);
-
-  // Check if user is logged in
+  // Redirect if not logged in
   useEffect(() => {
     if (!user) {
       Swal.fire({
@@ -42,7 +35,7 @@ function MoodTracker() {
     }
   }, [user, navigate]);
 
-  // Load today's entry if exists
+  // Load today's saved entry
   useEffect(() => {
     if (!user) return;
     const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
@@ -56,8 +49,17 @@ function MoodTracker() {
     }
   }, [user, formattedDate]);
 
-  const logMoodHandler=()=>{
-    if (!user) return;
+  // Handle logging mood + AI tips
+  const logMoodHandler = () => {
+    if (!user) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in first!",
+        confirmButtonColor: "#06b6d4",
+      });
+      return;
+    }
 
     if (!mood || !notes) {
       Swal.fire({
@@ -69,23 +71,33 @@ function MoodTracker() {
       return;
     }
 
-    callOpenAIPAI()
-  }
+    callOpenAIPAI();
+  };
 
-
+  // ✅ Modern OpenAI Chat API
   const callOpenAIPAI = async () => {
-
-    setLoading(true); 
+    if (!user || !mood || !notes) return;
+    setLoading(true);
 
     const APIBody = {
-      model: "gpt-3.5-turbo-instruct",
-      prompt: `Write three very short motivational suggestions for someone feeling ${mood} today. Note: ${notes}`,
-      max_tokens: 60,
-      temperature: 0.7,
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a supportive wellness coach offering short, kind suggestions.",
+        },
+        {
+          role: "user",
+          content: `Write three short motivational suggestions for someone feeling ${mood} today. Note: ${notes}`,
+        },
+      ],
+      max_tokens: 80,
+      temperature: 0.8,
     };
 
     try {
-      const res = await fetch("https://api.openai.com/v1/completions", {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,8 +106,12 @@ function MoodTracker() {
         body: JSON.stringify(APIBody),
       });
 
+      if (!res.ok) throw new Error("Failed to connect to OpenAI API.");
+
       const data = await res.json();
-      const suggestionText = data.choices[0].text.trim();
+      const suggestionText =
+        data?.choices?.[0]?.message?.content?.trim() || "No suggestion found.";
+
       setAiTip(suggestionText);
 
       const newEntry = {
@@ -106,7 +122,8 @@ function MoodTracker() {
         userEmail: user.email,
       };
 
-      const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
+      const storedEntries =
+        JSON.parse(localStorage.getItem("moodEntries")) || [];
       const updatedEntries = [
         ...storedEntries.filter(
           (e) => e.userEmail !== user.email || e.date !== formattedDate
@@ -119,31 +136,55 @@ function MoodTracker() {
         icon: "success",
         title: "Mood Logged!",
         text: "Your mood has been saved successfully.",
-        confirmButtonColor: "#06b6d4",
+        timerProgressBar: true,
+        timer: 3000,
+        showConfirmButton: false,
       });
-
-      setMood("");
-      setNotes("");
     } catch (err) {
       console.error("AI API error:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to fetch AI suggestions. Please try again.",
+        text: "Failed to fetch AI suggestions. Please check your API key or connection.",
         confirmButtonColor: "#06b6d4",
       });
-    }finally {
-    setLoading(false); // hide spinner after done
-  }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const resetHandler=()=>{
+  // ✅ Reset with check for empty input fields
+  const resetHandler = () => {
+    if (!user) return;
+
+    const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
+    const todayEntry = storedEntries.find(
+      (e) => e.userEmail === user.email && e.date === formattedDate
+    );
+
+    // 🧩 Check if both fields are empty
+    if (!mood && !notes && !aiTip) {
+      Swal.fire({
+        icon: "info",
+        title: "No Data to Reset",
+        text: "There’s no data in the fields to reset.",
+        showConfirmButton: false,
+        timerProgressBar: true,
+        timer: 3000,
+      });
+      return;
+    }
+
+    // 🧩 If there's an entry in storage or data in fields, reset it
+    if (!todayEntry && !mood && !notes) {
+      console.log("No entry found for today — skipping reset alert.");
+      return;
+    }
+
     setMood("");
     setNotes("");
     setAiTip("");
 
-    // Also remove today's entry from localStorage
-    const storedEntries = JSON.parse(localStorage.getItem("moodEntries")) || [];
     const updatedEntries = storedEntries.filter(
       (e) => e.userEmail !== user.email || e.date !== formattedDate
     );
@@ -153,17 +194,18 @@ function MoodTracker() {
       icon: "info",
       title: "Entry Reset",
       text: "Today's mood entry has been cleared.",
-      confirmButtonColor: "#06b6d4",
+      showConfirmButton: false,
+      timerProgressBar: true,
+      timer: 3000,
     });
-  }
+  };
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen font-montserrat flex flex-col lg:flex-row gap-6 px-4 md:px-6 py-6">
-       
-        <div className="flex-1 flex flex-col gap-5">
-         
+      <div className="min-h-screen font-montserrat flex flex-col lg:flex-row gap-8 px-4 md:px-6 py-8">
+        <div className="flex-1 flex flex-col gap-6">
+          {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0 mt-[4rem]">
             <Link to="/" className="flex items-center text-neutral-500">
               <MdArrowBack className="text-md mr-1" />
@@ -177,6 +219,7 @@ function MoodTracker() {
             </Link>
           </div>
 
+          {/* Mood Form */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -184,7 +227,6 @@ function MoodTracker() {
             }}
             className="flex flex-col gap-4"
           >
-           
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 flex items-center">
                 <label
@@ -276,49 +318,41 @@ function MoodTracker() {
                   <span>Log Mood</span>
                 )}
               </button>
-
-              {/* <button
-                type="submit"
-                className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded transition-colors duration-300 w-full sm:w-auto flex justify-between"
-              >
-                {
-                  loading ?
-                   (<>
-                  <FaSpinner className="animate-spin text-white text-lg"/><span>loading...</span>
-                  </>
-                  )  
-                  :  <span>Log Mood</span>
-                  
-                }
-              </button> */}
             </div>
           </form>
 
+          {/* AI Suggestions */}
           {aiTip && (
-           <div className="flex flex-col gap-3">
-            <div className="mt-5 bg-[#f4fcfa] border border-cyan-200 rounded-xl p-4 flex flex-col">
-              <h3 className="font-semibold text-gray-700 flex items-center gap-2 mb-3">
-                <Brain className="text-teal-500" size="20px" /> AI suggestions...
-              </h3>
-              <ol className="ml-5 text-sm">
-                {aiTip.split(/(?=\d+\.)/).map((sentence, idx) => (
-                  <li key={idx}>{sentence}</li>
-                ))}
-              </ol>
+            <div className="flex flex-col gap-3">
+              <div className="mt-5 bg-[#f4fcfa] border border-cyan-200 rounded-xl p-4 flex flex-col">
+                <h3 className="font-semibold text-gray-700 flex items-center gap-2 mb-3">
+                  <Brain className="text-teal-500" size="20px" /> AI
+                  suggestions...
+                </h3>
+                <ol className="ml-5 text-sm list-decimal">
+                  {aiTip.split(/[\n•-]+/).map((tip, idx) => (
+                    <li key={idx}>{tip.trim()}</li>
+                  ))}
+                </ol>
+              </div>
+              <div className="flex justify-start">
+                <button
+                  type="button"
+                  onClick={callOpenAIPAI}
+                  className="text-xs text-cyan-600 hover:bg-cyan-700 hover:text-white bg-white px-4 py-2 rounded-md transition-colors duration-300 border border-cyan-600 cursor-pointer"
+                >
+                  Regenerate
+                </button>
+              </div>
             </div>
-            <div className="flex justify-start">
-              <button
-                type="button"
-                onClick={logMoodHandler}
-                className="text-xs text-cyan-600 hover:bg-cyan-700 hover:text-white  bg-white px-4 py-2 rounded-md transition-colors duration-300 border border-cyan-600 cursor-pointer"
-              >
-                Regenerate
-              </button>
-            </div>
-          </div>
-
           )}
+
+          <p className="text-center text-xs text-gray-500 mt-6">
+            🔒 Your data stays private — saved only on your device.
+          </p>
         </div>
+
+        {/* Right Image Section */}
         <div className="hidden lg:flex flex-1 justify-center items-center bg-cyan-50 rounded-lg p-4">
           <img
             src={HappyPerson}
