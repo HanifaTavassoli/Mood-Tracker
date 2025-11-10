@@ -329,11 +329,11 @@ function MoodTracker() {
                   <Brain className="text-teal-500" size="20px" /> AI
                   suggestions...
                 </h3>
-                <ol className="ml-5 text-sm list-decimal">
+                <ul className="ml-5 text-sm">
                   {aiTip.split(/[\n•-]+/).map((tip, idx) => (
                     <li key={idx}>{tip.trim()}</li>
                   ))}
-                </ol>
+                </ul>
               </div>
               <div className="flex justify-start">
                 <button
